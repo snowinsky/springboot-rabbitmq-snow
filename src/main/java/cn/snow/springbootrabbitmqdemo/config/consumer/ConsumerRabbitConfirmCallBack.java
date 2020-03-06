@@ -1,4 +1,4 @@
-package cn.snow.springbootrabbitmqdemo.config;
+package cn.snow.springbootrabbitmqdemo.config.consumer;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
@@ -11,7 +11,7 @@ import org.springframework.util.concurrent.SettableListenableFuture;
 
 @Component
 @Slf4j
-public class RabbitConfirmCallBack implements RabbitTemplate.ConfirmCallback {
+public class ConsumerRabbitConfirmCallBack implements RabbitTemplate.ConfirmCallback {
     @Override
     public void confirm(CorrelationData correlationData, boolean ack, String cause) {
         SettableListenableFuture<CorrelationData.Confirm> confirmFuture = correlationData.getFuture();
