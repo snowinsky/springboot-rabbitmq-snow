@@ -5,19 +5,33 @@ import org.springframework.amqp.rabbit.annotation.*;
 import org.springframework.amqp.support.AmqpHeaders;
 import org.springframework.messaging.handler.annotation.Headers;
 import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Map;
 
+@Component
 public class Consumer {
-
-    //配置监听的哪一个队列，同时在没有queue和exchange的情况下会去创建并建立绑定关系
-    @RabbitListener(
+    /**
+     * https://www.jianshu.com/p/911d987b5f11
+     *
+     * 使用 @RabbitListener 注解标记方法，当监听到队列 debug 中有消息时则会进行接收并处理.
+     * @RabbitListener 和 @RabbitHandler 搭配使用
+     *   @RabbitListener 可以标在方法和类上面，若标在类上需配合 @RabbitHandler 注解一起使用
+     *   @RabbitListener 标在类上面表示当有收到消息的时候，就交给 @RabbitHandler 的方法处理，具体使用哪个方法处理，根据 MessageConverter 转换后的参数类型
+     *     例如，一个handler接收String，一个handler接收byte[] 重载处理
+     *
+     * @param order
+     * @param headers
+     * @param channel
+     * @throws IOException
+     */
+    @RabbitListener(  //该注解标识该方法是用来消费消息的方法
             bindings = @QueueBinding(
-                    value = @Queue(value = "order-queue", durable = "true"),
-                    exchange = @Exchange(name = "order-exchange", durable = "true", type = "topic"),
-                    key = "order.*")
+                    value = @Queue(value = "queueName", durable = "true"),//指定了queue的名字
+                    exchange = @Exchange(name = "exchangeName", durable = "true", type = "topic"), //指定exchange的一些参数
+                    key = "order.*") //binding key
     )
     @RabbitHandler//如果有消息过来，在消费的时候调用这个方法
     public void onOrderMessage(@Payload LocalDateTime order, @Headers Map<String, Object> headers, Channel channel) throws IOException {
